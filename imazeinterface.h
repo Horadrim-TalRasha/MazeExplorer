@@ -7,9 +7,8 @@
 class IMazeInterface
 {
 public:
-	
-protected:
-	virtual void GenterateMaze() = 0;
+	virtual int GenerateMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY) = 0;
+	virtual int DisplayMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY) = 0;
 	virtual	void ChangeArch() = 0;
 	virtual void PutMonsterIn() = 0;
 };

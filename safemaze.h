@@ -5,10 +5,13 @@
 #include "absmaze.h"
 #include "imazeinterface.h"
 
-class SafeMaze : public IMazeInterface
+
+class SafeMaze : public AbsMaze
 {
 public:
 	SafeMaze(IMazeInterface* pIMazeInterface);
+	int InitMaze(const unsigned int& uiX, const unsigned int& uiY);
+	int StartExplore();
 
 protected:
 	void GenerateMaze();
@@ -18,6 +21,7 @@ protected:
 
 private:
 	IMazeInterface* m_pIMazeInterface;
+	char** m_ppMazeArch;
 };
 
 #endif
