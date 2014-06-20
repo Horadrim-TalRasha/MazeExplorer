@@ -12,7 +12,8 @@ public:
 	void ChangeArch();
 	void PutMonsterIn();
 
-
+private:
+	const unsigned char m_ucThrShldValueOfMazeArch;
 };
 
 

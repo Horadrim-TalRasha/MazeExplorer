@@ -19,11 +19,21 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 	m_uiX = uiX;
 	m_uiY = uiY;
-	m_ppMazeArch = (char**)malloc(uiX * uiY);
+	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
 	if(m_ppMazeArch == NULL)
 	{
 		std::cout << "memory error" << std::endl;
 		return -1;
+	}
+
+	for(unsigned int i = 0; i < uiY; i++)
+	{
+		char* pLandScapMaze = (char*)malloc(uiX);
+		if(pLandScapMaze == NULL)
+		{
+
+		}
+		
 	}
 
 	return m_pIMazeInterface->GenerateMaze(m_ppMazeArch, uiX, uiY);
