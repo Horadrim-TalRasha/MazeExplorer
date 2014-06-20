@@ -2,7 +2,9 @@
 
 SafeMaze::SafeMaze(IMazeInterface* pIMazeInterface) :
 m_pIMazeInterface(pIMazeInterface),
-m_ppMazeArch(0)
+m_ppMazeArch(0),
+m_uiX(0),
+m_uiY(0)
 {
 
 }
@@ -15,6 +17,8 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
+	m_uiX = uiX;
+	m_uiY = uiY;
 	m_ppMazeArch = (char**)malloc(uiX * uiY);
 	if(m_ppMazeArch == NULL)
 	{
@@ -31,6 +35,11 @@ int SafeMaze::StartExplore()
 	return 0;
 }
 
+void SafeMaze::Display()
+{
+	m_pIMazeInterface->DisplayMaze(m_ppMazeArch, m_uiX, m_uiY);
+}
+/**
 void SafeMaze::GenerateMaze()
 {
 
@@ -45,3 +54,4 @@ void SafeMaze::PutMonsterIn()
 {
 
 }
+**/

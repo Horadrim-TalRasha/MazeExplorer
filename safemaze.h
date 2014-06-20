@@ -25,6 +25,8 @@ protected:
 private:
 	IMazeInterface* m_pIMazeInterface;
 	char** m_ppMazeArch;
+	unsigned int m_uiX;
+	unsigned int m_uiY;
 };
 
 #endif
