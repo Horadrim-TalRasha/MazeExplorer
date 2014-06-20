@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-	SafeMazeInterface safeMzIntfa;
-	SafeMaze safeMaze(&safeMzIntfa);
+	IMazeInterface* pSafeMazeInterface = new SafeMazeInterface();
+	AbsMaze* pSafeMaze = new SafeMaze(pSafeMazeInterface);
 	return 0;
 }
