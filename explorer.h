@@ -8,7 +8,8 @@ enum EDirector
 	E_Up = 0,
 	E_Down,
 	E_Left,
-	E_Right
+	E_Right,
+	E_Directors
 };
 
 class Explorer

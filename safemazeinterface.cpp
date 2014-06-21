@@ -8,13 +8,17 @@ m_ucMazeArchFactor(10)
 
 }
 
-int SafeMazeInterface::GenerateMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY)
+int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY)
 {
 	if(uiCurY >= uiY)
 		return 0;
 
 	char* pLandScale = (char*)malloc(uiX);
-	if(pLandScale == NULL)
+	long* pLandScaleOfExplr = (long*)malloc(sizeof(long) * uiX);
+	memset(pLandScaleOfExplr, 0, sizeof(long) * uiX);
+	memset(pLandScale, 0, uiX);
+
+	if(pLandScale == NULL || pLandScaleOfExplr == NULL)
 	{
 		return 1;
 	}
@@ -25,22 +29,27 @@ int SafeMazeInterface::GenerateMaze(char** ppMazeArch, const unsigned int& uiX, 
 	}
 
 	ppMazeArch[uiCurY] = pLandScale;
-	if(GenerateMaze(ppMazeArch, uiX, uiY, uiCurY + 1))
+	ppExplrPos[uiCurY] = pLandScaleOfExplr;
+	if(GenerateMaze(ppMazeArch, ppExplrPos, uiX, uiY, uiCurY + 1))
 	{
 		delete pLandScale;
 		pLandScale = 0;
+		delete pLandScaleOfExplr;
+		pLandScaleOfExplr = 0;
 		return 1;
 	}
 	return 0;
 }
 
-int SafeMazeInterface::DisplayMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY)
+int SafeMazeInterface::DisplayMaze(char** ppMazeArch, long** ppObjsPos, const unsigned int& uiX, const unsigned int& uiY)
 {
 	for(unsigned int i = 0; i < uiX; i++)
 	{
 		for(unsigned int j = 0; j < uiY; j++)
 		{
-			if(ppMazeArch[j][i])
+			if(ppObjsPos[j][i] != 0)
+				std::cout << '*';
+			else if(ppMazeArch[j][i])
 				std::cout << (char)182;
 			else
 				std::cout << ' ';
