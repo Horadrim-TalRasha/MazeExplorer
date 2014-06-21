@@ -12,10 +12,14 @@ class SafeMaze : public AbsMaze
 {
 public:
 	SafeMaze(IMazeInterface* pIMazeInterface);
+	virtual ~SafeMaze();
 	int InitMaze(const unsigned int& uiX, const unsigned int& uiY);
 	int StartExplore();
 	void Display();
-
+	
+	//	测试代码
+	bool TestMazeValIsBinary();				//	数组中的值只能为0和1
+	bool TestMazeCornValIsZero();			//	迷宫四个角上的值都为0
 protected:
 //	void GenerateMaze();
 //	void ChangeArch();

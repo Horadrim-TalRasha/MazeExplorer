@@ -1,6 +1,7 @@
+#include <unistd.h>
 #include "safemaze.h"
 #include "safemazeinterface.h"
-
+#include "explorer.h"
 
 int main(int argc, char** argv)
 {
@@ -22,5 +23,16 @@ int main(int argc, char** argv)
 	}
 
 	((SafeMaze*)pSafeMaze)->Display();
+	((SafeMaze*)pSafeMaze)->TestMazeValIsBinary();
+	if(!((SafeMaze*)pSafeMaze)->TestMazeCornValIsZero())
+	{
+		std::cout << "Maze corner value is not 0" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "Test maze corner value is zero passed" << std::endl;
+	}
+
 	return 0;
 }
