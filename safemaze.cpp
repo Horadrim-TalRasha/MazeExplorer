@@ -16,6 +16,12 @@ SafeMaze::~SafeMaze()
 
 int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 {
+	if(pthread_mutex_init(&m_mutex, NULL))
+	{
+		std::cout << "mutex init error." << std::endl;
+		return -1;
+	}
+
 	if(uiX < MIN_X || uiY < MIN_Y)
 	{
 		std::cout << "size error" << std::endl;

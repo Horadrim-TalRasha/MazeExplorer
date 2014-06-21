@@ -31,6 +31,8 @@ private:
 	char** m_ppMazeArch;
 	unsigned int m_uiX;
 	unsigned int m_uiY;
+
+	pthread_mutex_t m_mutex;
 };
 
 #endif

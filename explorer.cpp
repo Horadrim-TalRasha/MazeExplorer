@@ -1,7 +1,9 @@
 #include "explorer.h"
 
 
-Explorer::Explorer()
+Explorer::Explorer() :
+m_iCurX(-1),
+m_iCurY(-1)
 {
 
 }

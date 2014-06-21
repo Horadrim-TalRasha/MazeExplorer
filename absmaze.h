@@ -4,6 +4,7 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
+#include <pthread.h>
 
 #define MIN_X 15
 #define MIN_Y 15

@@ -9,7 +9,7 @@ OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 $(BinName) : $(OBJS) 
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) -lpthread
 
 clean:
 	@rm -rf *.o $(BinName) 2>/dev/null
