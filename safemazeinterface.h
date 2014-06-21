@@ -7,13 +7,14 @@ class SafeMazeInterface : public IMazeInterface
 {
 public:
 	SafeMazeInterface();
-	int GenerateMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY);
+	int GenerateMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY);
 	int DisplayMaze(char** ppMazeArch, const unsigned int& uiX, const unsigned int& uiY);
 	void ChangeArch();
 	void PutMonsterIn();
 
 private:
 	const unsigned char m_ucThrShldValueOfMazeArch;
+	const unsigned char m_ucMazeArchFactor;
 };
 
 

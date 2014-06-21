@@ -26,17 +26,7 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
-	for(unsigned int i = 0; i < uiY; i++)
-	{
-		char* pLandScapMaze = (char*)malloc(uiX);
-		if(pLandScapMaze == NULL)
-		{
-
-		}
-		
-	}
-
-	return m_pIMazeInterface->GenerateMaze(m_ppMazeArch, uiX, uiY);
+	return m_pIMazeInterface->GenerateMaze(m_ppMazeArch, uiX, uiY, 0);
 }
 
 int SafeMaze::StartExplore()

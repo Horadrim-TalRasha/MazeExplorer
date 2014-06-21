@@ -4,13 +4,6 @@
 
 int main(int argc, char** argv)
 {
-	char** pp = (char**)malloc(sizeof(char*) * 2);
-
-	for(int i = 0; i < 16; i++)
-	{
-		char* p = 
-	}
-
 	//	设置随机数种子
 	srand(time(NULL));
 
@@ -19,7 +12,7 @@ int main(int argc, char** argv)
 	AbsMaze* pSafeMaze = new SafeMaze(pSafeMazeInterface);
 
 	//	初始化对象
-	if(pSafeMaze->InitMaze(16, 16))
+	if(pSafeMaze->InitMaze(16, 32))
 	{
 		delete pSafeMaze;
 		delete pSafeMazeInterface;
@@ -28,5 +21,6 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	((SafeMaze*)pSafeMaze)->Display();
 	return 0;
 }
