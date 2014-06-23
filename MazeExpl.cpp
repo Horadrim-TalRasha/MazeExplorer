@@ -61,5 +61,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	((SafeMaze*)pSafeMaze)->Display();
+	((SafeMaze*)pSafeMaze)->StartExplore();
 	return 0;
 }

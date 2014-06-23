@@ -16,12 +16,6 @@ SafeMaze::~SafeMaze()
 
 int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 {
-	if(pthread_mutex_init(&m_mutex, NULL))
-	{
-		std::cout << "mutex init error." << std::endl;
-		return -1;
-	}
-
 	if(uiX < MIN_X || uiY < MIN_Y)
 	{
 		std::cout << "size error" << std::endl;
@@ -30,15 +24,18 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 	m_uiX = uiX;
 	m_uiY = uiY;
+
 	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
 	m_ppObjsPos = (long**)malloc(uiY * sizeof(long*));
-	if(m_ppMazeArch == NULL)
+	m_ppObjsMutex = (pthread_mutex_t**)(uiY * sizeof(pthread_mutex_t*));	
+	
+	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
 	{
 		std::cout << "memory error" << std::endl;
 		return -1;
 	}
 
-	if(m_pIMazeInterface->GenerateMaze(m_ppMazeArch, m_ppObjsPos, uiX, uiY, 0))
+	if(m_pIMazeInterface->GenerateMaze(m_ppMazeArch, m_ppObjsPos, m_ppObjsMutex, uiX, uiY, 0))
 	{
 		std::cout << "memory error in generate maze" << std::endl;
 		return -1;
@@ -53,7 +50,19 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 int SafeMaze::StartExplore()
 {
+	for(int i = 0; i < 4; i ++)
+	{
+		if(m_szpExplorers[i] != NULL)
+		{
+			pthread_t tr;
+			char szpBuff[sizeof(SafeMaze) + 4];
+			memcpy(szpBuff, this, sizeof(SafeMaze));
+			memcpy(szpBuff + sizeof(SafeMaze), &i, sizeof(i));
+			pthread_create(&tr,NULL, ExplrThrd, szpBuff);
+		}
+	}
 
+	while(1);
 	return 0;
 }
 
@@ -90,6 +99,26 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 		break;
 	}
 	return 0;
+}
+
+void* SafeMaze::ExplrThrd(void* param)
+{
+	SafeMaze* pMaze = (SafeMaze*)param;
+	int iExplrNo = *(int*)((char*)param + sizeof(SafeMaze));
+
+	while(1)
+	{
+
+	}
+
+	return NULL;
+}
+
+void* SafeMaze::TestMutexThrd(void* param)
+{
+	sleep(1);
+	SafeMaze* pMaze = (SafeMaze*)param;
+	return NULL;
 }
 
 bool SafeMaze::TestMazeValIsBinary()
@@ -144,6 +173,13 @@ bool SafeMaze::TestMazeExplrNull()
 			return false;
 		}
 	}
+	return true;
+}
+
+bool SafeMaze::TestMutex()
+{
+	pthread_t tr;
+	pthread_create(&tr, NULL, TestMutexThrd, this);
 	return true;
 }
 

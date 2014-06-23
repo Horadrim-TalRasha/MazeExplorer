@@ -8,17 +8,18 @@ m_ucMazeArchFactor(10)
 
 }
 
-int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY)
+int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, pthread_mutex_t** ppMutex, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY)
 {
 	if(uiCurY >= uiY)
 		return 0;
 
 	char* pLandScale = (char*)malloc(uiX);
 	long* pLandScaleOfExplr = (long*)malloc(sizeof(long) * uiX);
+	pthread_mutex_t* pMutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * uiX);
 	memset(pLandScaleOfExplr, 0, sizeof(long) * uiX);
 	memset(pLandScale, 0, uiX);
 
-	if(pLandScale == NULL || pLandScaleOfExplr == NULL)
+	if(pLandScale == NULL || pLandScaleOfExplr == NULL || pMutex == NULL)
 	{
 		return 1;
 	}
@@ -26,11 +27,13 @@ int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, const 
 	for(unsigned int i = 0; i < uiX; i++)
 	{
 		pLandScale[i] = ((random() % m_ucMazeArchFactor < 4) ? 1 : 0);
+		pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+		pMutex[i] = mtx;
 	}
 
 	ppMazeArch[uiCurY] = pLandScale;
 	ppExplrPos[uiCurY] = pLandScaleOfExplr;
-	if(GenerateMaze(ppMazeArch, ppExplrPos, uiX, uiY, uiCurY + 1))
+	if(GenerateMaze(ppMazeArch, ppExplrPos, ppMutex, uiX, uiY, uiCurY + 1))
 	{
 		delete pLandScale;
 		pLandScale = 0;

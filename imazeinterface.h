@@ -5,11 +5,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
+
 
 class IMazeInterface
 {
 public:
-	virtual int GenerateMaze(char** ppMazeArch, long** ppExplrPos, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY) = 0;
+	virtual int GenerateMaze(char** ppMazeArch, long** ppExplrPos, pthread_mutex_t** ppMutex, const unsigned int& uiX, const unsigned int& uiY, const unsigned int& uiCurY) = 0;
 	virtual int DisplayMaze(char** ppMazeArch, long** ppObjsPos, const unsigned int& uiX, const unsigned int& uiY) = 0;
 	virtual	void ChangeArch() = 0;
 	virtual void PutMonsterIn() = 0;

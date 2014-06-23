@@ -23,6 +23,7 @@ public:
 	bool TestMazeCornValIsZero();			//	迷宫四个角上的值都为0
 	bool TestObjsPosAllZero();				//	探险者位置均为0
 	bool TestMazeExplrNull();				//	探险者均不存在
+	bool TestMutex();						//	测试互斥锁
 protected:
 //	void GenerateMaze();
 //	void ChangeArch();
@@ -38,7 +39,11 @@ private:
 	unsigned int m_uiY;
 
 	Explorer* m_szpExplorers[4];
-	pthread_mutex_t m_mutex;
+	pthread_mutex_t** m_ppObjsMutex;
+
+private:
+	static void* ExplrThrd(void* param);
+	static void* TestMutexThrd(void* param);
 };
 
 #endif
