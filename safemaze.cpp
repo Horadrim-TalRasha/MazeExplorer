@@ -62,7 +62,6 @@ int SafeMaze::StartExplore()
 		}
 	}
 
-	while(1);
 	return 0;
 }
 
@@ -87,15 +86,23 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 	{
 	case 0:
 		m_ppObjsPos[0][0] = (long)pExplorer;
+		pExplorer->SetCurX(0);
+		pExplorer->SetCurY(0);
 		break;
 	case 1:
 		m_ppObjsPos[0][m_uiX - 1] = (long)pExplorer;
+		pExplorer->SetCurX((int)(m_uiX - 1));
+		pExplorer->SetCurY(0);
 		break;
 	case 2:
 		m_ppObjsPos[m_uiY - 1][0] = (long)pExplorer;
+		pExplorer->SetCurX(0);
+		pExplorer->SetCurY((int)(m_uiY - 1));
 		break;
 	case 3:
 		m_ppObjsPos[m_uiY - 1][m_uiX - 1] = (long)pExplorer;
+		pExplorer->SetCurX((int)(m_uiX - 1));
+		pExplorer->SetCurY((int)(m_uiY - 1));
 		break;
 	}
 	return 0;
@@ -108,7 +115,10 @@ void* SafeMaze::ExplrThrd(void* param)
 
 	while(1)
 	{
-
+		sleep(1);
+		unsigned int uiDestX = 0;
+		unsigned int uiDestY = 0;
+		pMaze->m_szpExplorers[iExplrNo]->Walk(uiDestX, uiDestY);
 	}
 
 	return NULL;
@@ -202,6 +212,35 @@ bool SafeMaze::TestMutex()
 	return ret;
 }
 
+bool SafeMaze::TestExplrInPos()
+{
+	bool ret = true;
+	for(int i = 0; i < 4; i++)
+	{
+		if(m_szpExplorers[i])
+		{
+			switch(i)
+			{
+			case 0:
+				ret = (m_szpExplorers[i]->CurX() == 0) && (m_szpExplorers[i]->CurY() == 0);
+				break;		
+			case 1:
+				ret = (m_szpExplorers[i]->CurX() == (int)(m_uiX - 1)) && (m_szpExplorers[i]->CurY() == 0);
+				break;
+			case 2:
+				ret = (m_szpExplorers[i]->CurX() == 0) && (m_szpExplorers[i]->CurY() == (int)(m_uiY - 1));
+				break;
+			case 3:
+				ret = (m_szpExplorers[i]->CurX() == (int)(m_uiX - 1)) && (m_szpExplorers[i]->CurY() == (int)(m_uiY - 1));
+				break;
+			}
+		}
+
+		if(!ret)
+			break;
+	}
+	return ret;
+}
 /**
 void SafeMaze::GenerateMaze()
 {

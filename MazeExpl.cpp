@@ -70,7 +70,21 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	((SafeMaze*)pSafeMaze)->Display();
-//	((SafeMaze*)pSafeMaze)->StartExplore();
+	if(!((SafeMaze*)pSafeMaze)->TestExplrInPos())
+	{
+		std::cout << "Test Explr In Pos not passed" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "Test Explr In Pos passed" << std::endl;
+	}
+
+	((SafeMaze*)pSafeMaze)->StartExplore();
+	while(1)
+	{
+		sleep(3);
+		((SafeMaze*)pSafeMaze)->Display();
+	}
 	return 0;
 }

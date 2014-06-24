@@ -24,6 +24,7 @@ public:
 	bool TestObjsPosAllZero();				//	探险者位置均为0
 	bool TestMazeExplrNull();				//	探险者均不存在
 	bool TestMutex();						//	测试互斥锁
+	bool TestExplrInPos();
 protected:
 //	void GenerateMaze();
 //	void ChangeArch();

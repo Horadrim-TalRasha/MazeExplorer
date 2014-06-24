@@ -2,6 +2,8 @@
 #define ABS_POWER_H
 
 
+#include <iostream>
+
 enum EPowerType
 {
 	E_Break_Wall = 0,

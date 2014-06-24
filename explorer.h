@@ -16,8 +16,12 @@ class Explorer
 {
 public:
 	Explorer();
-	int Walk(const EDirector& eDirector, const unsigned int& step, const unsigned int& uiXEdge, const unsigned int& uiYEdge);
+	int Walk(unsigned int& uiDestX, unsigned int& uiDestY);
 	int ActivatePower(AbsPower* pPower);
+	inline void SetCurX(const int& iCurX) {	m_iCurX = iCurX;	}
+	inline void SetCurY(const int& iCurY) {	m_iCurY = iCurY;	}
+	inline int CurX() {	return m_iCurX;	}
+	inline int CurY() {	return m_iCurY;	}
 
 private:
 	int m_iCurX;

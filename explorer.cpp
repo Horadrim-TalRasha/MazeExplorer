@@ -8,9 +8,9 @@ m_iCurY(-1)
 
 }
 
-int Explorer::Walk(const EDirector& eDirectory, const unsigned int& uiStep, const unsigned int& uiXEdge, const unsigned int& uiYEdge)
+int Explorer::Walk(unsigned int& uiDestX, unsigned int& uiDestY)
 {
-
+	
 	return 0;
 }
 
