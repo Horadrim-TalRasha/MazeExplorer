@@ -33,6 +33,7 @@ int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, pthrea
 
 	ppMazeArch[uiCurY] = pLandScale;
 	ppExplrPos[uiCurY] = pLandScaleOfExplr;
+	ppMutex[uiCurY] = pMutex;
 	if(GenerateMaze(ppMazeArch, ppExplrPos, ppMutex, uiX, uiY, uiCurY + 1))
 	{
 		delete pLandScale;

@@ -54,13 +54,23 @@ int main(int argc, char** argv)
 		std::cout << "Test Explr is all null passed" << std::endl;
 	}
 
+	if(!((SafeMaze*)pSafeMaze)->TestMutex())
+	{
+		std::cout << "Test mutex not passed" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "Test mutex passed" << std::endl;
+	}
 
 	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplorer))
 	{
 		std::cout << "Set Explorer failed" << std::endl;
 		return 1;
 	}
+
 	((SafeMaze*)pSafeMaze)->Display();
-	((SafeMaze*)pSafeMaze)->StartExplore();
+//	((SafeMaze*)pSafeMaze)->StartExplore();
 	return 0;
 }

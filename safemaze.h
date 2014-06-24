@@ -43,7 +43,6 @@ private:
 
 private:
 	static void* ExplrThrd(void* param);
-	static void* TestMutexThrd(void* param);
 };
 
 #endif

@@ -27,7 +27,7 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
 	m_ppObjsPos = (long**)malloc(uiY * sizeof(long*));
-	m_ppObjsMutex = (pthread_mutex_t**)(uiY * sizeof(pthread_mutex_t*));	
+	m_ppObjsMutex = (pthread_mutex_t**)malloc(uiY * sizeof(pthread_mutex_t*));	
 	
 	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
 	{
@@ -114,13 +114,6 @@ void* SafeMaze::ExplrThrd(void* param)
 	return NULL;
 }
 
-void* SafeMaze::TestMutexThrd(void* param)
-{
-	sleep(1);
-	SafeMaze* pMaze = (SafeMaze*)param;
-	return NULL;
-}
-
 bool SafeMaze::TestMazeValIsBinary()
 {
 	for(unsigned int i = 0; i < m_uiX; i++)
@@ -178,9 +171,35 @@ bool SafeMaze::TestMazeExplrNull()
 
 bool SafeMaze::TestMutex()
 {
-	pthread_t tr;
-	pthread_create(&tr, NULL, TestMutexThrd, this);
-	return true;
+	for(unsigned int i = 0; i < m_uiY; i++)
+	{
+		for(unsigned int j = 0; j < m_uiX; j++)
+			pthread_mutex_lock(&m_ppObjsMutex[i][j]);
+	}
+
+	int ret = 0;
+	for(unsigned int i = 0; i < m_uiY; i++)
+	{
+		for(unsigned int j = 0; j < m_uiX; j++)
+		{
+			ret = pthread_mutex_trylock(&m_ppObjsMutex[i][j]);
+			if(ret)
+				continue;
+			else
+				break;
+		}
+		if(ret == 0)
+			break;
+	}
+
+	for(unsigned int i = 0; i < m_uiY; i++)
+	{
+		for(unsigned int j = 0; j < m_uiX; j++)
+		{
+			pthread_mutex_unlock(&m_ppObjsMutex[i][j]);
+		}
+	}
+	return ret;
 }
 
 /**
