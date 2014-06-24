@@ -108,6 +108,28 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 	return 0;
 }
 
+int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& uiX, const unsigned int& uiY)
+{
+	if(idx < 0 || idx >= 4)
+	{
+		return 1;
+	}
+	else if(m_szpExplorers[idx] != 0)
+	{
+		return 2;
+	}
+
+	if(IsPosInMaze(uiX, uiY))
+	{
+		m_szpExplorers[idx] = pExplr;
+		pExplr->SetCurX(uiX);
+		pExplr->SetCurY(uiY);
+		m_ppObjsPos[uiY][uiX] = (long)pExplr;
+		return 0;
+	}
+	return 3;
+}
+
 void* SafeMaze::ExplrThrd(void* param)
 {
 	srand(time(NULL));

@@ -5,7 +5,7 @@ CFLAGS = -g -Wall
 CXXFLAGS = -g -Wall
 OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o
 
-ifneq ($(SKIP_TEST), "true")
+ifeq ($(SKIP_TEST), true)
 	CXXFLAGS += -DSKIP_TEST
 endif
 
