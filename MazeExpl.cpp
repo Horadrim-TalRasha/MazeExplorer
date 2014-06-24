@@ -23,6 +23,21 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+#ifndef SKIP_TEST
+/**
+	if(((SafeMaze*)pSafeMaze)->TestIsPosInMaze(33, 24))
+	{
+		std::cout << "x:33, y:24 is not in maze, test failed" << std::endl;
+		return 1;
+	}
+
+	if(!((SafeMaze*)pSafeMaze)->TestIsPosInMaze(2, 5))
+	{
+		std::cout << "x: 2, y: 5 is in maze, test faliled" << std::endl;
+		return 1;
+	}
+**/
+
 	((SafeMaze*)pSafeMaze)->TestMazeValIsBinary();
 
 	if(!((SafeMaze*)pSafeMaze)->TestMazeCornValIsZero())
@@ -54,6 +69,7 @@ int main(int argc, char** argv)
 		std::cout << "Test Explr is all null passed" << std::endl;
 	}
 
+/**
 	if(!((SafeMaze*)pSafeMaze)->TestMutex())
 	{
 		std::cout << "Test mutex not passed" << std::endl;
@@ -63,6 +79,8 @@ int main(int argc, char** argv)
 	{
 		std::cout << "Test mutex passed" << std::endl;
 	}
+**/
+#endif
 
 	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplorer))
 	{
@@ -70,6 +88,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+#ifndef SKIP_TEST
 	if(!((SafeMaze*)pSafeMaze)->TestExplrInPos())
 	{
 		std::cout << "Test Explr In Pos not passed" << std::endl;
@@ -79,12 +98,15 @@ int main(int argc, char** argv)
 	{
 		std::cout << "Test Explr In Pos passed" << std::endl;
 	}
+#endif
 
 	((SafeMaze*)pSafeMaze)->StartExplore();
 	while(1)
 	{
 		sleep(3);
+		std::cout << "CUR POSITION:" << std::endl;
 		((SafeMaze*)pSafeMaze)->Display();
+		std::cout << std::endl;
 	}
 	return 0;
 }

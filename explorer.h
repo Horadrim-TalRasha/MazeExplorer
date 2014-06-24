@@ -16,7 +16,9 @@ class Explorer
 {
 public:
 	Explorer();
+	virtual ~Explorer();
 	int Walk(unsigned int& uiDestX, unsigned int& uiDestY);
+	int Walk(unsigned int& uiDestX, unsigned int& uiDesyY, const EDirector& eDirector);
 	int ActivatePower(AbsPower* pPower);
 	inline void SetCurX(const int& iCurX) {	m_iCurX = iCurX;	}
 	inline void SetCurY(const int& iCurY) {	m_iCurY = iCurY;	}
