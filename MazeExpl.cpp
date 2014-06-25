@@ -99,7 +99,8 @@ int main(int argc, char** argv)
 		std::cout << "Test Explr In Pos passed" << std::endl;
 	}
 #endif
-
+	
+	((SafeMaze*)pSafeMaze)->Display();
 	((SafeMaze*)pSafeMaze)->StartExplore();
 	while(1);
 	return 0;
