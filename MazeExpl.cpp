@@ -101,12 +101,6 @@ int main(int argc, char** argv)
 #endif
 
 	((SafeMaze*)pSafeMaze)->StartExplore();
-	while(1)
-	{
-		sleep(3);
-		std::cout << "CUR POSITION:" << std::endl;
-		((SafeMaze*)pSafeMaze)->Display();
-		std::cout << std::endl;
-	}
+	while(1);
 	return 0;
 }

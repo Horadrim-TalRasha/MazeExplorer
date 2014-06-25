@@ -141,6 +141,8 @@ void* SafeMaze::ExplrThrd(void* param)
 		sleep(1);
 		unsigned int uiDestX = 0;
 		unsigned int uiDestY = 0;
+		const unsigned int iPrevX = pMaze->m_szpExplorers[3]->CurX();
+		const unsigned int iPrevY = pMaze->m_szpExplorers[3]->CurY();
 		if(pMaze->m_szpExplorers[3]->Walk(uiDestX, uiDestY))
 		{
 			continue;
@@ -149,20 +151,18 @@ void* SafeMaze::ExplrThrd(void* param)
 		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[3]))
 		{
 		case 0:
-			std::cout << 3 << " explorer move From x: " << pMaze->m_szpExplorers[3]->CurX() << " y: " << pMaze->m_szpExplorers[3]->CurY() << " To x: "
-					  << uiDestX << " y: " << uiDestY << " success." << std::endl;
+			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+			std::cout << "CUR POSITION" << std::endl;
+			pMaze->Display();
 			break;
 		case 1:
-			std::cout << 3 << " explorer move From x: " << pMaze->m_szpExplorers[3]->CurX() << " y: " << pMaze->m_szpExplorers[3]->CurY() << " To x: "
-				  << uiDestX << " y: " << uiDestY << " failed." << "maze pos can't be access" << std::endl;
+			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "maze pos can't be access" << std::endl;
 			break;
 		case 2:
-			std::cout << 3 << " explorer move From x: " << pMaze->m_szpExplorers[3]->CurX() << " y: " << pMaze->m_szpExplorers[3]->CurY() << " To x: "
-					  << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want read pos status." << std::endl;
+			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want read pos status." << std::endl;
 			break;
 		case 3:
-			std::cout << 3 << " explorer move From x: " << pMaze->m_szpExplorers[3]->CurX() << " y: " << pMaze->m_szpExplorers[3]->CurY() << " To x: "
-					  << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want to move." << std::endl;
+			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want to move." << std::endl;
 			break;
 		}
 	}
