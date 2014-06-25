@@ -40,6 +40,7 @@ private:
 	long** m_ppObjsPos;
 	unsigned int m_uiX;
 	unsigned int m_uiY;
+	const unsigned int m_uiSleepInterval;
 
 	Explorer* m_szpExplorers[4];
 	pthread_rwlock_t** m_ppObjsMutex;

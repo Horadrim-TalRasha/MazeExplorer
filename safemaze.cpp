@@ -4,7 +4,8 @@ SafeMaze::SafeMaze(IMazeInterface* pIMazeInterface) :
 m_pIMazeInterface(pIMazeInterface),
 m_ppMazeArch(0),
 m_uiX(0),
-m_uiY(0)
+m_uiY(0),
+m_uiSleepInterval(3)
 {
 
 }
@@ -138,7 +139,7 @@ void* SafeMaze::ExplrThrd(void* param)
 
 	while(1)
 	{
-		sleep(1);
+		sleep(pMaze->m_uiSleepInterval);
 		unsigned int uiDestX = 0;
 		unsigned int uiDestY = 0;
 		const unsigned int iPrevX = pMaze->m_szpExplorers[3]->CurX();
@@ -151,18 +152,18 @@ void* SafeMaze::ExplrThrd(void* param)
 		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[3]))
 		{
 		case 0:
-			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
 			std::cout << "CUR POSITION" << std::endl;
 			pMaze->Display();
 			break;
 		case 1:
-			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "maze pos can't be access" << std::endl;
+			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
 			break;
 		case 2:
-			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want read pos status." << std::endl;
+			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
 			break;
 		case 3:
-			std::cout << 3 << " explorer move From x: " << iPrevX << " y: " << iPrevY << " To x: " << uiDestX << " y: " << uiDestY << " failed." << "pos occupied when explore want to move." << std::endl;
+			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
 			break;
 		}
 	}
