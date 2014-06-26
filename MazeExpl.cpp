@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 	Explorer* pExplorer = new Explorer();
 
 	//	初始化对象
-	if(pSafeMaze->InitMaze(16, 32))
+	if(pSafeMaze->InitEmptyMaze(16, 32))
 	{
 		delete pSafeMaze;
 		delete pSafeMazeInterface;

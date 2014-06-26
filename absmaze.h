@@ -13,7 +13,9 @@
 class AbsMaze
 {
 public:
+	virtual ~AbsMaze() {	}
 	virtual int InitMaze(const unsigned int& uiX, const unsigned int& uiY) = 0;
+	virtual int InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY) = 0;
 	virtual int StartExplore() = 0;
 
 

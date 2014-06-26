@@ -49,6 +49,36 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 	return 0;
 }
 
+int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
+{
+	if(uiX < MIN_X || uiY < MIN_Y)
+	{
+		std::cout << "size error" << std::endl;
+		return -1;
+	}
+
+	m_uiX = uiX;
+	m_uiY = uiY;
+
+	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
+	m_ppObjsPos = (long**)malloc(uiY * sizeof(long*));
+	m_ppObjsMutex = (pthread_rwlock_t**)malloc(uiY * sizeof(pthread_rwlock_t*));	
+	
+	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
+	{
+		std::cout << "memory error" << std::endl;
+		return -1;
+	}
+
+	if(m_pIMazeInterface->GenerateEmptyMaze(m_ppMazeArch, m_ppObjsPos, m_ppObjsMutex, uiX, uiY, 0))
+	{
+		std::cout << "memory error in generate maze" << std::endl;
+		return -1;
+	}
+
+	return 0;
+}
+
 int SafeMaze::StartExplore()
 {
 	for(int i = 0; i < 4; i ++)
@@ -56,10 +86,13 @@ int SafeMaze::StartExplore()
 		if(m_szpExplorers[i] != NULL)
 		{
 			pthread_t tr;
+			long buff[2];
+			buff[0] = (long)this;
+			buff[1] = i;
 //			char szpBuff[sizeof(SafeMaze) + 4];
 //			memcpy(szpBuff, this, sizeof(SafeMaze));
 //			memcpy(szpBuff + sizeof(SafeMaze), &i, sizeof(i));
-			pthread_create(&tr,NULL, ExplrThrd, this);
+			pthread_create(&tr,NULL, ExplrThrd, buff);
 		}
 	}
 
@@ -134,7 +167,9 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& 
 void* SafeMaze::ExplrThrd(void* param)
 {
 	srand(time(NULL));
-	SafeMaze* pMaze = (SafeMaze*)param;
+	long* lpArgv = (long*)param;
+	SafeMaze* pMaze = (SafeMaze*)(lpArgv[0]);
+	int iExplrNo = (int)(lpArgv[1]);
 //	int 3 = *(int*)((char*)param + sizeof(SafeMaze));
 
 	while(1)
@@ -142,28 +177,28 @@ void* SafeMaze::ExplrThrd(void* param)
 		sleep(pMaze->m_uiSleepInterval);
 		unsigned int uiDestX = 0;
 		unsigned int uiDestY = 0;
-		const unsigned int iPrevX = pMaze->m_szpExplorers[3]->CurX();
-		const unsigned int iPrevY = pMaze->m_szpExplorers[3]->CurY();
-		if(pMaze->m_szpExplorers[3]->Walk(uiDestX, uiDestY))
+		const unsigned int iPrevX = pMaze->m_szpExplorers[iExplrNo]->CurX();
+		const unsigned int iPrevY = pMaze->m_szpExplorers[iExplrNo]->CurY();
+		if(pMaze->m_szpExplorers[iExplrNo]->Walk(uiDestX, uiDestY))
 		{
 			continue;
 		}
 
-		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[3]))
+		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[iExplrNo]))
 		{
 		case 0:
-			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
 			std::cout << "CUR POSITION" << std::endl;
 			pMaze->Display();
 			break;
 		case 1:
-			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
+			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
 			break;
 		case 2:
-			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
+			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
 			break;
 		case 3:
-			std::cout << 3 << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
+			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
 			break;
 		}
 	}

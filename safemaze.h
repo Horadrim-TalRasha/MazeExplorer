@@ -13,7 +13,8 @@ class SafeMaze : public AbsMaze
 public:
 	SafeMaze(IMazeInterface* pIMazeInterface);
 	virtual ~SafeMaze();
-	int InitMaze(const unsigned int& uiX, const unsigned int& uiY);
+	virtual int InitMaze(const unsigned int& uiX, const unsigned int& uiY);
+	virtual int InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY);
 	int StartExplore();
 	void Display();
 	int SetExplorer(const int& idx, Explorer* pExplr);
