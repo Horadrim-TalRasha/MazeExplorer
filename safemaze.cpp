@@ -1,5 +1,9 @@
 #include "safemaze.h"
 
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;
+
+
 SafeMaze::SafeMaze(IMazeInterface* pIMazeInterface) :
 m_pIMazeInterface(pIMazeInterface),
 m_ppMazeArch(0),
@@ -12,6 +16,7 @@ m_uiSleepInterval(3)
 
 SafeMaze::~SafeMaze()
 {
+	std::cout << "SafeMaze destroyed" << std::endl;
 	delete m_ppMazeArch;
 }
 
@@ -89,13 +94,25 @@ int SafeMaze::StartExplore()
 			long buff[2];
 			buff[0] = (long)this;
 			buff[1] = i;
-//			char szpBuff[sizeof(SafeMaze) + 4];
-//			memcpy(szpBuff, this, sizeof(SafeMaze));
-//			memcpy(szpBuff + sizeof(SafeMaze), &i, sizeof(i));
 			pthread_create(&tr,NULL, ExplrThrd, buff);
 		}
 	}
 
+	return 0;
+}
+
+int SafeMaze::CompetePos()
+{
+	pthread_rwlock_wrlock(&rwlock);
+	long szpThrdParam[8];
+	for(int i = 0; i < 4; i++)
+	{
+		szpThrdParam[i * 2] = (long)this;
+		szpThrdParam[i * 2 + 1] = i;
+		pthread_t thrd;
+		pthread_create(&thrd, NULL, ExplrCompeteThrd, &szpThrdParam[i * 2]);
+	}
+	
 	return 0;
 }
 
@@ -119,22 +136,30 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 	switch(idx)
 	{
 	case 0:
+		pthread_rwlock_wrlock(&m_ppObjsMutex[0][0]);
 		m_ppObjsPos[0][0] = (long)pExplorer;
+		pthread_rwlock_unlock(&m_ppObjsMutex[0][0]);
 		pExplorer->SetCurX(0);
 		pExplorer->SetCurY(0);
 		break;
 	case 1:
+		pthread_rwlock_wrlock(&m_ppObjsMutex[0][m_uiX - 1]);
 		m_ppObjsPos[0][m_uiX - 1] = (long)pExplorer;
+		pthread_rwlock_unlock(&m_ppObjsMutex[0][m_uiX - 1]);
 		pExplorer->SetCurX((int)(m_uiX - 1));
 		pExplorer->SetCurY(0);
 		break;
 	case 2:
+		pthread_rwlock_wrlock(&m_ppObjsMutex[m_uiY - 1][0]);
 		m_ppObjsPos[m_uiY - 1][0] = (long)pExplorer;
+		pthread_rwlock_unlock(&m_ppObjsMutex[m_uiY - 1][0]);
 		pExplorer->SetCurX(0);
 		pExplorer->SetCurY((int)(m_uiY - 1));
 		break;
 	case 3:
+		pthread_rwlock_wrlock(&m_ppObjsMutex[m_uiY - 1][m_uiX - 1]);
 		m_ppObjsPos[m_uiY - 1][m_uiX - 1] = (long)pExplorer;
+		pthread_rwlock_unlock(&m_ppObjsMutex[m_uiY - 1][m_uiX - 1]);
 		pExplorer->SetCurX((int)(m_uiX - 1));
 		pExplorer->SetCurY((int)(m_uiY - 1));
 		break;
@@ -158,7 +183,9 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& 
 		m_szpExplorers[idx] = pExplr;
 		pExplr->SetCurX(uiX);
 		pExplr->SetCurY(uiY);
+		pthread_rwlock_wrlock(&m_ppObjsMutex[uiY][uiX]);
 		m_ppObjsPos[uiY][uiX] = (long)pExplr;
+		pthread_rwlock_unlock(&m_ppObjsMutex[uiY][uiX]);
 		return 0;
 	}
 	return 3;
@@ -170,7 +197,6 @@ void* SafeMaze::ExplrThrd(void* param)
 	long* lpArgv = (long*)param;
 	SafeMaze* pMaze = (SafeMaze*)(lpArgv[0]);
 	int iExplrNo = (int)(lpArgv[1]);
-//	int 3 = *(int*)((char*)param + sizeof(SafeMaze));
 
 	while(1)
 	{
@@ -203,6 +229,50 @@ void* SafeMaze::ExplrThrd(void* param)
 		}
 	}
 
+	return NULL;
+}
+
+void* SafeMaze::ExplrCompeteThrd(void* param)
+{
+	long* lpArgv = (long*)param;
+	SafeMaze* pMaze = (SafeMaze*)(lpArgv[0]);
+	long iExplrNo = lpArgv[1];
+	
+	unsigned int uiDestX = 0;
+	unsigned int uiDestY = 0;
+	const unsigned int iPrevX = pMaze->m_szpExplorers[iExplrNo]->CurX();
+	const unsigned int iPrevY = pMaze->m_szpExplorers[iExplrNo]->CurY();
+	pMaze->m_szpExplorers[iExplrNo]->Walk(uiDestX, uiDestY, (EDirector)iExplrNo);
+
+	pthread_mutex_lock(&lock);
+	std::cout << "ExplrNo: " << iExplrNo << " Ready For Compete." << std::endl;
+	pthread_mutex_unlock(&lock);
+
+	pthread_rwlock_rdlock(&rwlock);
+	switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[iExplrNo]))
+	{
+	case 0:
+		pthread_mutex_lock(&lock);
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+		pthread_mutex_unlock(&lock);
+		break;
+	case 1:
+		pthread_mutex_lock(&lock);
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
+		pthread_mutex_unlock(&lock);
+		break;
+	case 2:
+		pthread_mutex_lock(&lock);
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
+		pthread_mutex_unlock(&lock);
+		break;
+	case 3:
+		pthread_mutex_lock(&lock);
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
+		pthread_mutex_unlock(&lock);
+		break;
+	}
+//	pthread_rwlock_unlock(&rwlock);
 	return NULL;
 }
 
@@ -342,31 +412,8 @@ bool SafeMaze::TestExplrInPos()
 	{
 		if(m_szpExplorers[i])
 		{
-			switch(i)
-			{
-			case 0:
-				ret = (m_szpExplorers[i]->CurX() == 0) && 
-					  (m_szpExplorers[i]->CurY() == 0) && 
-					  ((long)m_szpExplorers[i] == m_ppObjsPos[0][0]);
-				break;		
-			case 1:
-				ret = (m_szpExplorers[i]->CurX() == (int)(m_uiX - 1)) && 
-					  (m_szpExplorers[i]->CurY() == 0) && 
-        			  ((long)m_szpExplorers[i] == m_ppObjsPos[0][m_uiX - 1]);
-				break;
-			case 2:
-				ret = (m_szpExplorers[i]->CurX() == 0) && 
-					  (m_szpExplorers[i]->CurY() == (int)(m_uiY - 1)) &&
-					  ((long)m_szpExplorers[i] == m_ppObjsPos[m_uiY - 1][0]);
-				break;
-			case 3:
-				ret = (m_szpExplorers[i]->CurX() == (long)(m_uiX - 1)) && 
-					  (m_szpExplorers[i]->CurY() == (int)(m_uiY - 1)) &&
-					  ((long)m_szpExplorers[i] == m_ppObjsPos[m_uiY - 1][m_uiX - 1]);
-				break;
-			}
+			ret = ((long)m_szpExplorers[i] == m_ppObjsPos[m_szpExplorers[i]->CurY()][m_szpExplorers[i]->CurX()]);
 		}
-
 		if(!ret)
 			break;
 	}

@@ -3,6 +3,8 @@
 #include "safemazeinterface.h"
 #include "explorer.h"
 
+extern pthread_rwlock_t rwlock;
+
 int main(int argc, char** argv)
 {
 	//	设置随机数种子
@@ -81,14 +83,37 @@ int main(int argc, char** argv)
 	}
 **/
 #endif
+	Explorer* pExplr_1 = new Explorer();
+	Explorer* pExplr_2 = new Explorer();
+	Explorer* pExplr_3 = new Explorer();
+	Explorer* pExplr_4 = new Explorer();
 
-	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplorer))
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(0, pExplr_1, 10, 11))
+	{
+		std::cout << "Set Explorer failed" << std::endl;
+		return 1;
+	}
+
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(1, pExplr_2, 10, 9))
+	{
+		std::cout << "Set Explorer failed" << std::endl;
+		return 1;
+	}
+
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(2, pExplr_3, 11, 10))
+	{
+		std::cout << "Set Explorer failed" << std::endl;
+		return 1;
+	}
+
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplr_4, 9, 10))
 	{
 		std::cout << "Set Explorer failed" << std::endl;
 		return 1;
 	}
 
 #ifndef SKIP_TEST
+
 	if(!((SafeMaze*)pSafeMaze)->TestExplrInPos())
 	{
 		std::cout << "Test Explr In Pos not passed" << std::endl;
@@ -98,10 +123,19 @@ int main(int argc, char** argv)
 	{
 		std::cout << "Test Explr In Pos passed" << std::endl;
 	}
+
 #endif
 	
 	((SafeMaze*)pSafeMaze)->Display();
-	((SafeMaze*)pSafeMaze)->StartExplore();
+
+	((SafeMaze*)pSafeMaze)->CompetePos();
+//	sleep(10);
+	for(int i = 0; i < 10000000; i++);
+		pthread_rwlock_unlock(&rwlock);
+//	((SafeMaze*)pSafeMaze)->StartExplore();
+	sleep(5);
+	
+	((SafeMaze*)pSafeMaze)->Display();
 	while(1);
 	return 0;
 }

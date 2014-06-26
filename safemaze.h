@@ -16,6 +16,7 @@ public:
 	virtual int InitMaze(const unsigned int& uiX, const unsigned int& uiY);
 	virtual int InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY);
 	int StartExplore();
+	int CompetePos();
 	void Display();
 	int SetExplorer(const int& idx, Explorer* pExplr);
 	int SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& uiX, const unsigned int& uiY);
@@ -48,6 +49,7 @@ private:
 
 private:
 	static void* ExplrThrd(void* param);
+	static void* ExplrCompeteThrd(void* param);
 	bool IsPosInMaze(const unsigned int& uiX, const unsigned int& uiY);
 	int MoveExplorer(const unsigned int& uiX, const unsigned int& uiY, Explorer* pExplr);
 };
