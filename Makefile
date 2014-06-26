@@ -9,6 +9,10 @@ ifeq ($(SKIP_TEST), true)
 	CXXFLAGS += -DSKIP_TEST
 endif
 
+ifeq ($(COMPETE_TEST), true)
+	CXXFLAGS += -DCOMPETE_TEST
+endif
+
 %.o : %.cpp
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 

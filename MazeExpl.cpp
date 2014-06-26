@@ -16,14 +16,29 @@ int main(int argc, char** argv)
 	Explorer* pExplorer = new Explorer();
 
 	//	初始化对象
-	if(pSafeMaze->InitEmptyMaze(16, 32))
+#ifndef COMPETE_TEST
+	if(pSafeMaze->InitMaze(32, 16))
 	{
 		delete pSafeMaze;
 		delete pSafeMazeInterface;
+		delete pExplorer;
 		pSafeMaze = 0;
 		pSafeMazeInterface = 0;
+		pExplorer = 0;
 		return -1;
 	}
+#else
+	if(pSafeMaze->InitEmptyMaze(32, 16))
+	{
+		delete pSafeMaze;
+		delete pSafeMazeInterface;
+		delete pExplorer;
+		pSafeMaze = 0;
+		pSafeMazeInterface = 0;
+		pExplorer = 0;
+		return -1;
+	}
+#endif
 
 #ifndef SKIP_TEST
 /**
@@ -83,34 +98,57 @@ int main(int argc, char** argv)
 	}
 **/
 #endif
+
+#ifdef COMPETE_TEST
 	Explorer* pExplr_1 = new Explorer();
 	Explorer* pExplr_2 = new Explorer();
 	Explorer* pExplr_3 = new Explorer();
 	Explorer* pExplr_4 = new Explorer();
 
-	if(((SafeMaze*)pSafeMaze)->SetExplorer(0, pExplr_1, 10, 11))
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(2, pExplr_1, 11, 10))
 	{
 		std::cout << "Set Explorer failed" << std::endl;
 		return 1;
 	}
 
-	if(((SafeMaze*)pSafeMaze)->SetExplorer(1, pExplr_2, 10, 9))
+	sleep(2);
+	((SafeMaze*)pSafeMaze)->Display();
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(0, pExplr_3, 10, 11))
 	{
 		std::cout << "Set Explorer failed" << std::endl;
 		return 1;
 	}
 
-	if(((SafeMaze*)pSafeMaze)->SetExplorer(2, pExplr_3, 11, 10))
+	sleep(2);
+	((SafeMaze*)pSafeMaze)->Display();
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplr_2, 9, 10))
+	{
+		std::cout << "Set Explorer failed" << std::endl;
+		return 1;
+	}
+	sleep(2);
+	((SafeMaze*)pSafeMaze)->Display();
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(1, pExplr_4, 10, 9))
 	{
 		std::cout << "Set Explorer failed" << std::endl;
 		return 1;
 	}
 
-	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplr_4, 9, 10))
+	sleep(2);
+	((SafeMaze*)pSafeMaze)->Display();
+#else
+	if(((SafeMaze*)pSafeMaze)->SetExplorer(3, pExplorer))
 	{
-		std::cout << "Set Explorer failed" << std::endl;
-		return 1;
+		delete pSafeMaze;
+		delete pSafeMazeInterface;
+		delete pExplorer;
+		pSafeMaze = 0;
+		pSafeMazeInterface = 0;
+		pExplorer = 0;
+		return -1;	
 	}
+
+#endif
 
 #ifndef SKIP_TEST
 
@@ -128,14 +166,26 @@ int main(int argc, char** argv)
 	
 	((SafeMaze*)pSafeMaze)->Display();
 
+#ifdef COMPETE_TEST
 	((SafeMaze*)pSafeMaze)->CompetePos();
-//	sleep(10);
 	for(int i = 0; i < 10000000; i++);
 		pthread_rwlock_unlock(&rwlock);
-//	((SafeMaze*)pSafeMaze)->StartExplore();
+
 	sleep(5);
 	
 	((SafeMaze*)pSafeMaze)->Display();
+	if(!((SafeMaze*)pSafeMaze)->TestExplrInPos())
+	{
+		std::cout << "Test Explr In Pos not passed" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "Test Explr In Pos passed" << std::endl;
+	}
+#else
+	((SafeMaze*)pSafeMaze)->StartExplore();
+#endif
 	while(1);
 	return 0;
 }

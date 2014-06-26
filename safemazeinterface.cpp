@@ -83,13 +83,13 @@ int SafeMazeInterface::GenerateEmptyMaze(char** ppMazeArch, long** ppExplrPos, p
 
 int SafeMazeInterface::DisplayMaze(char** ppMazeArch, long** ppObjsPos, const unsigned int& uiX, const unsigned int& uiY)
 {
-	for(unsigned int i = 0; i < uiX; i++)
+	for(unsigned int i = 0; i < uiY; i++)
 	{
-		for(unsigned int j = 0; j < uiY; j++)
+		for(unsigned int j = 0; j < uiX; j++)
 		{
-			if(ppObjsPos[j][i] != 0)
+			if(ppObjsPos[i][j] != 0)
 				std::cout << '*';
-			else if(ppMazeArch[j][i])
+			else if(ppMazeArch[i][j])
 				std::cout << (char)182;
 			else
 				std::cout << ' ';

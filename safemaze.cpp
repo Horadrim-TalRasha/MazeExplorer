@@ -253,22 +253,22 @@ void* SafeMaze::ExplrCompeteThrd(void* param)
 	{
 	case 0:
 		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success. " << (EDirector)iExplrNo <<  std::endl;
 		pthread_mutex_unlock(&lock);
 		break;
 	case 1:
 		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access. " << (EDirector)iExplrNo << std::endl;
 		pthread_mutex_unlock(&lock);
 		break;
 	case 2:
 		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << (EDirector)iExplrNo << std::endl;
 		pthread_mutex_unlock(&lock);
 		break;
 	case 3:
 		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
+		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << (EDirector)iExplrNo << std::endl;
 		pthread_mutex_unlock(&lock);
 		break;
 	}
