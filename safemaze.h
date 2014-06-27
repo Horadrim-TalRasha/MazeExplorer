@@ -27,7 +27,7 @@ public:
 	bool TestMazeCornValIsZero();			//	迷宫四个角上的值都为0
 	bool TestObjsPosAllZero();				//	探险者位置均为0
 	bool TestMazeExplrNull();				//	探险者均不存在
-//	bool TestMutex();						//	测试互斥锁
+	bool TestRWLock();						//	测试读写锁
 	bool TestExplrInPos();
 	bool TestIsPosInMaze(const unsigned int& uiX, const unsigned int& uiY);
 protected:

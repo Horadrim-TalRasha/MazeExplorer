@@ -5,7 +5,7 @@
 #include "TextLog.h"
 
 extern pthread_rwlock_t rwlock;
-
+pthread_mutex_t deadlock = PTHREAD_MUTEX_INITIALIZER;
 int main(int argc, char** argv)
 {
 	//	设置随机数种子
@@ -86,17 +86,15 @@ int main(int argc, char** argv)
 		std::cout << "Test Explr is all null passed" << std::endl;
 	}
 
-/**
-	if(!((SafeMaze*)pSafeMaze)->TestMutex())
+	if(!((SafeMaze*)pSafeMaze)->TestRWLock())
 	{
-		std::cout << "Test mutex not passed" << std::endl;
+		std::cout << "Test rwlock not passed" << std::endl;
 		return 1;
 	}
 	else
 	{
-		std::cout << "Test mutex passed" << std::endl;
+		std::cout << "Test rwlock passed" << std::endl;
 	}
-**/
 #endif
 
 #ifdef COMPETE_TEST
@@ -186,6 +184,7 @@ int main(int argc, char** argv)
 #else
 	((SafeMaze*)pSafeMaze)->StartExplore();
 #endif
-	while(1);
+	pthread_mutex_lock(&deadlock);
+	pthread_mutex_lock(&deadlock);
 	return 0;
 }

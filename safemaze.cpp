@@ -391,40 +391,65 @@ bool SafeMaze::TestMazeExplrNull()
 	return true;
 }
 
-/**
-bool SafeMaze::TestMutex()
+
+bool SafeMaze::TestRWLock()
 {
 	for(unsigned int i = 0; i < m_uiY; i++)
 	{
 		for(unsigned int j = 0; j < m_uiX; j++)
-			pthread_mutex_lock(&m_ppObjsMutex[i][j]);
+			pthread_rwlock_rdlock(&m_ppObjsMutex[i][j]);
 	}
 
-	int ret = 0;
 	for(unsigned int i = 0; i < m_uiY; i++)
 	{
 		for(unsigned int j = 0; j < m_uiX; j++)
 		{
-			ret = pthread_mutex_trylock(&m_ppObjsMutex[i][j]);
+			bool ret = (pthread_rwlock_tryrdlock(&m_ppObjsMutex[i][j]) == 0 && pthread_rwlock_trywrlock(&m_ppObjsMutex[i][j]) != 0);
 			if(ret)
+			{
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
 				continue;
+			}
 			else
-				break;
+			{
+				std::cout << "rwlock, x: " << j << " y: " << i << " has exception." << std::endl;
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
+				return false;
+			}
 		}
-		if(ret == 0)
-			break;
 	}
 
 	for(unsigned int i = 0; i < m_uiY; i++)
 	{
 		for(unsigned int j = 0; j < m_uiX; j++)
 		{
-			pthread_mutex_unlock(&m_ppObjsMutex[i][j]);
+			pthread_rwlock_wrlock(&m_ppObjsMutex[i][j]);
 		}
 	}
-	return ret;
+
+	for(unsigned int i = 0; i < m_uiY; i++)
+	{
+		for(unsigned int j = 0; j < m_uiX; j++)
+		{
+			bool ret = (pthread_rwlock_tryrdlock(&m_ppObjsMutex[i][j]) != 0 && pthread_rwlock_trywrlock(&m_ppObjsMutex[i][j]));
+			if(ret)
+			{
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
+				continue;
+			}
+			else
+			{
+				std::cout << "rwlock, x: " << j << " y: " << i << " has exception." << std::endl;
+				pthread_rwlock_unlock(&m_ppObjsMutex[i][j]);
+				return false;
+			}
+		}
+	}
+	return true;
 }
-**/
+
 
 bool SafeMaze::TestExplrInPos()
 {
