@@ -22,4 +22,4 @@ $(BinName) : $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) -lpthread
 
 clean:
-	@rm -rf *.o $(BinName) 2>/dev/null
+	@rm -rf $(OBJS) $(BinName) 2>/dev/null
