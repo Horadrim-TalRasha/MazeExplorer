@@ -2,6 +2,8 @@
 #define SAFE_MAZE_INTERFACE_H
 
 #include "imazeinterface.h"
+#include "TextLog.h"
+
 
 class SafeMazeInterface : public IMazeInterface
 {

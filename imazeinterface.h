@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-
+#include "TextLog.h"
 
 class IMazeInterface
 {
@@ -16,6 +16,10 @@ public:
 	virtual int DisplayMaze(char** ppMazeArch, long** ppObjsPos, const unsigned int& uiX, const unsigned int& uiY) = 0;
 	virtual	void ChangeArch() = 0;
 	virtual void PutMonsterIn() = 0;
+	inline void SetTextLog(TextLog* pTextLog) {	m_pTextLog = pTextLog; }
+
+protected:
+	TextLog* m_pTextLog;
 };
 
 #endif

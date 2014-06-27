@@ -11,7 +11,10 @@ m_uiX(0),
 m_uiY(0),
 m_uiSleepInterval(3)
 {
-
+	strcpy(m_cLogConfig.szpLogPath, "./logs");
+	strcpy(m_cLogConfig.szpLogName, "maze_explorer_log");
+	m_cLogConfig.u64LimitSize = 204800000;
+	m_cLogConfig.uiExpiredDays = 5;
 }
 
 SafeMaze::~SafeMaze()
@@ -28,8 +31,16 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
+	if(m_cTextLog.Init(&m_cLogConfig))
+	{
+		std::cout << "Log Init Error" << std::endl;
+		return -1;
+	}
+
 	m_uiX = uiX;
 	m_uiY = uiY;
+	m_pIMazeInterface->SetTextLog(&m_cTextLog);
+	m_cTextLog.Write("MazeExplorer Start...");
 
 	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
 	m_ppObjsPos = (long**)malloc(uiY * sizeof(long*));
@@ -37,7 +48,7 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 	
 	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
 	{
-		std::cout << "memory error" << std::endl;
+		m_cTextLog.Write("Allocate Memory For Maze Error");
 		return -1;
 	}
 
@@ -47,6 +58,7 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
+	m_cTextLog.Write("Allocate Memory For Maze Success.");
 	m_ppMazeArch[0][0] = 0;
 	m_ppMazeArch[m_uiY - 1][0] = 0;
 	m_ppMazeArch[0][m_uiX - 1] = 0;
@@ -62,8 +74,16 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
+	if(m_cTextLog.Init(&m_cLogConfig))
+	{
+		std::cout << "Log Init Error" << std::endl;
+		return -1;
+	}
+
 	m_uiX = uiX;
 	m_uiY = uiY;
+	m_pIMazeInterface->SetTextLog(&m_cTextLog);
+	m_cTextLog.Write("MazeExplorer Start...");
 
 	m_ppMazeArch = (char**)malloc(uiY * sizeof(char*));
 	m_ppObjsPos = (long**)malloc(uiY * sizeof(long*));
@@ -71,16 +91,16 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 	
 	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
 	{
-		std::cout << "memory error" << std::endl;
+		m_cTextLog.Write("Allocate Memory For Maze Error");
 		return -1;
 	}
 
 	if(m_pIMazeInterface->GenerateEmptyMaze(m_ppMazeArch, m_ppObjsPos, m_ppObjsMutex, uiX, uiY, 0))
 	{
-		std::cout << "memory error in generate maze" << std::endl;
 		return -1;
 	}
 
+	m_cTextLog.Write("Allocate Memory For Maze Success.");
 	return 0;
 }
 
@@ -125,10 +145,12 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 {
 	if(idx < 0 || idx >= 4)
 	{
+		m_cTextLog.Write("Explorer No: %d is not in [0, 4)", idx);
 		return 1;
 	}
 	else if(m_szpExplorers[idx] != 0)
 	{
+		m_cTextLog.Write("Explorer No: %d has already been set.", idx);
 		return 2;
 	}
 	
@@ -141,6 +163,7 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 		pthread_rwlock_unlock(&m_ppObjsMutex[0][0]);
 		pExplorer->SetCurX(0);
 		pExplorer->SetCurY(0);
+		m_cTextLog.Write("Set Explorer No.%d at x: %d, y: %d", idx, pExplorer->CurX(), pExplorer->CurY());
 		break;
 	case 1:
 		pthread_rwlock_wrlock(&m_ppObjsMutex[0][m_uiX - 1]);
@@ -148,6 +171,7 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 		pthread_rwlock_unlock(&m_ppObjsMutex[0][m_uiX - 1]);
 		pExplorer->SetCurX((int)(m_uiX - 1));
 		pExplorer->SetCurY(0);
+		m_cTextLog.Write("Set Explorer No.%d at x: %d, y: %d", idx, pExplorer->CurX(), pExplorer->CurY());
 		break;
 	case 2:
 		pthread_rwlock_wrlock(&m_ppObjsMutex[m_uiY - 1][0]);
@@ -155,6 +179,7 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 		pthread_rwlock_unlock(&m_ppObjsMutex[m_uiY - 1][0]);
 		pExplorer->SetCurX(0);
 		pExplorer->SetCurY((int)(m_uiY - 1));
+		m_cTextLog.Write("Set Explorer No.%d at x: %d, y: %d", idx, pExplorer->CurX(), pExplorer->CurY());
 		break;
 	case 3:
 		pthread_rwlock_wrlock(&m_ppObjsMutex[m_uiY - 1][m_uiX - 1]);
@@ -162,6 +187,7 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplorer)
 		pthread_rwlock_unlock(&m_ppObjsMutex[m_uiY - 1][m_uiX - 1]);
 		pExplorer->SetCurX((int)(m_uiX - 1));
 		pExplorer->SetCurY((int)(m_uiY - 1));
+		m_cTextLog.Write("Set Explorer No.%d at x: %d, y: %d Success.", idx, pExplorer->CurX(), pExplorer->CurY());
 		break;
 	}
 	return 0;
@@ -171,10 +197,12 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& 
 {
 	if(idx < 0 || idx >= 4)
 	{
+		m_cTextLog.Write("Set Explorer No: %d at x: %d, y: %d is not in [0, 4)", idx, uiX, uiY);
 		return 1;
 	}
 	else if(m_szpExplorers[idx] != 0)
 	{
+		m_cTextLog.Write("Set Explorer No: %d at x: %d, y: %d has already been set", idx, uiX, uiY);
 		return 2;
 	}
 
@@ -186,6 +214,7 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& 
 		pthread_rwlock_wrlock(&m_ppObjsMutex[uiY][uiX]);
 		m_ppObjsPos[uiY][uiX] = (long)pExplr;
 		pthread_rwlock_unlock(&m_ppObjsMutex[uiY][uiX]);
+		m_cTextLog.Write("Set Explorer No: %d at x: %d, y: %d Success.", idx, uiX, uiY);
 		return 0;
 	}
 	return 3;
@@ -213,18 +242,18 @@ void* SafeMaze::ExplrThrd(void* param)
 		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[iExplrNo]))
 		{
 		case 0:
-			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success." << std::endl;
+			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 			std::cout << "CUR POSITION" << std::endl;
 			pMaze->Display();
 			break;
 		case 1:
-			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access" << std::endl;
+			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 			break;
 		case 2:
-			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << std::endl;
+			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 			break;
 		case 3:
-			std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << std::endl;
+			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 			break;
 		}
 	}
@@ -245,31 +274,23 @@ void* SafeMaze::ExplrCompeteThrd(void* param)
 	pMaze->m_szpExplorers[iExplrNo]->Walk(uiDestX, uiDestY, (EDirector)iExplrNo);
 
 	pthread_mutex_lock(&lock);
-	std::cout << "ExplrNo: " << iExplrNo << " Ready For Compete." << std::endl;
+	pMaze->m_cTextLog.Write("ExplrNo: %d Ready For Compete.", iExplrNo);
 	pthread_mutex_unlock(&lock);
 
 	pthread_rwlock_rdlock(&rwlock);
 	switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[iExplrNo]))
 	{
 	case 0:
-		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " success. " << (EDirector)iExplrNo <<  std::endl;
-		pthread_mutex_unlock(&lock);
+		pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 		break;
 	case 1:
-		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. maze pos can't be access. " << (EDirector)iExplrNo << std::endl;
-		pthread_mutex_unlock(&lock);
+		pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 		break;
 	case 2:
-		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want read pos status." << (EDirector)iExplrNo << std::endl;
-		pthread_mutex_unlock(&lock);
+		pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 		break;
 	case 3:
-		pthread_mutex_lock(&lock);
-		std::cout << iExplrNo << " explorer, x: " << iPrevX << " y: " << iPrevY << " ==> x: " << uiDestX << " y: " << uiDestY << " failed. pos occupied when explore want to move." << (EDirector)iExplrNo << std::endl;
-		pthread_mutex_unlock(&lock);
+		pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
 		break;
 	}
 //	pthread_rwlock_unlock(&rwlock);

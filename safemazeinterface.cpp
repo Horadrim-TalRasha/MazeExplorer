@@ -21,6 +21,7 @@ int SafeMazeInterface::GenerateMaze(char** ppMazeArch, long** ppExplrPos, pthrea
 
 	if(pLandScale == NULL || pLandScaleOfExplr == NULL || pRwLock == NULL)
 	{
+		m_pTextLog->Write("Allocate Error at %d rank", uiCurY);
 		return 1;
 	}
 
@@ -58,6 +59,7 @@ int SafeMazeInterface::GenerateEmptyMaze(char** ppMazeArch, long** ppExplrPos, p
 
 	if(pLandScale == NULL || pLandScaleOfExplr == NULL || pRwLock == NULL)
 	{
+		m_pTextLog->Write("Allocate Error at %d rank", uiCurY);
 		return 1;
 	}
 

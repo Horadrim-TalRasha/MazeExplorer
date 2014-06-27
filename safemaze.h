@@ -5,6 +5,7 @@
 #include "absmaze.h"
 #include "imazeinterface.h"
 #include "explorer.h"
+#include "TextLog.h"
 
 static const unsigned int g_uiThrshldOfMaze = 4;
 
@@ -46,6 +47,9 @@ private:
 
 	Explorer* m_szpExplorers[4];
 	pthread_rwlock_t** m_ppObjsMutex;
+
+	TextLog m_cTextLog;
+	LogConfig m_cLogConfig;
 
 private:
 	static void* ExplrThrd(void* param);
