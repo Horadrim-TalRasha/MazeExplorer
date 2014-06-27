@@ -3,7 +3,7 @@ CCX=g++
 CC=gcc
 CFLAGS = -g -Wall
 CXXFLAGS = -g -Wall
-OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o
+OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o FileUtil.o
 
 ifeq ($(SKIP_TEST), true)
 	CXXFLAGS += -DSKIP_TEST

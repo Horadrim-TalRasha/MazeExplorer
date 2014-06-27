@@ -2,6 +2,7 @@
 #include "safemaze.h"
 #include "safemazeinterface.h"
 #include "explorer.h"
+#include "TextLog.h"
 
 extern pthread_rwlock_t rwlock;
 
@@ -14,7 +15,14 @@ int main(int argc, char** argv)
 	IMazeInterface* pSafeMazeInterface = new SafeMazeInterface();
 	AbsMaze* pSafeMaze = new SafeMaze(pSafeMazeInterface);
 	Explorer* pExplorer = new Explorer();
-
+	TextLog cLog;
+	LogConfig config;
+	strcpy(config.szpLogPath, "./");
+	strcpy(config.szpLogName, "maze_exlorer_log");
+	config.u64LimitSize = 204800000;
+	config.uiExpiredDays = 5;
+	cLog.Init(&config);
+	cLog.Write("Log Object Created.");
 	//	初始化对象
 #ifndef COMPETE_TEST
 	if(pSafeMaze->InitMaze(32, 16))
