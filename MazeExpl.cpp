@@ -184,7 +184,7 @@ int main(int argc, char** argv)
 #else
 	((SafeMaze*)pSafeMaze)->StartExplore();
 #endif
-//	((SafeMaze*)pSafeMaze)->StartNetServ();
+//	((SafeMaze*)pSafeMaze)->StartNetServ();    // 此处起网络会出错
 	pthread_mutex_lock(&deadlock);
 	pthread_mutex_lock(&deadlock);
 	return 0;

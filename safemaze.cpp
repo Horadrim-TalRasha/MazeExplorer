@@ -152,7 +152,7 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 int SafeMaze::StartExplore()
 {
-	StartNetServ();
+	StartNetServ();			//  此处起epoll能保证pthread_create传值不出错
 	long szpThrdParam[8];
 	for(int i = 0; i < 4; i ++)
 	{
