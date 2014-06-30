@@ -6,6 +6,8 @@
 #include "imazeinterface.h"
 #include "explorer.h"
 #include "TextLog.h"
+#include "mazenet.h"
+
 
 static const unsigned int g_uiThrshldOfMaze = 4;
 
@@ -21,6 +23,7 @@ public:
 	void Display();
 	int SetExplorer(const int& idx, Explorer* pExplr);
 	int SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& uiX, const unsigned int& uiY);
+	int StartNetServ();
 	
 	//	测试代码
 	bool TestMazeValIsBinary();				//	数组中的值只能为0和1
@@ -50,10 +53,12 @@ private:
 
 	TextLog m_cTextLog;
 	LogConfig m_cLogConfig;
+	MazeNet m_MazeNet;
 
 private:
 	static void* ExplrThrd(void* param);
 	static void* ExplrCompeteThrd(void* param);
+	static void* StartNetSvrThrd(void* vdparam);
 	bool IsPosInMaze(const unsigned int& uiX, const unsigned int& uiY);
 	int MoveExplorer(const unsigned int& uiX, const unsigned int& uiY, Explorer* pExplr);
 };

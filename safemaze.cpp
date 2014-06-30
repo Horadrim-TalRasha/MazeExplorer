@@ -19,8 +19,44 @@ m_uiSleepInterval(3)
 
 SafeMaze::~SafeMaze()
 {
-	std::cout << "SafeMaze destroyed" << std::endl;
+	m_cTextLog.Write("safemaze destroyed");
+	for(unsigned int i = 0; i < m_uiY; i++)
+	{
+		char* pMazeArch = m_ppMazeArch[i];
+		pthread_rwlock_t* pObjsMutex = m_ppObjsMutex[i];
+		long* pObjsPos= m_ppObjsPos[i];
+		if(pMazeArch != 0)
+		{
+			free(pMazeArch);
+			pMazeArch = 0;
+		}
+
+		if(pObjsMutex != 0)
+		{
+			free(pObjsMutex);
+			pObjsMutex = 0;
+		}
+
+		if(pObjsPos != 0)
+		{
+			free(pObjsPos);
+			pObjsPos = 0;
+		}
+	}
+
+	for(int i = 0; i < 4; i++)
+	{
+		Explorer* pExplorer = m_szpExplorers[i];
+		if(pExplorer != NULL)
+		{
+			delete pExplorer;
+			pExplorer = 0;
+		}
+	}
 	delete m_ppMazeArch;
+	m_ppMazeArch = 0;
+	delete m_ppObjsMutex;
+	m_ppObjsMutex = 0;
 }
 
 int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
@@ -49,6 +85,11 @@ int SafeMaze::InitMaze(const unsigned int& uiX, const unsigned int& uiY)
 	if(m_ppMazeArch == NULL || m_ppObjsPos == NULL || m_ppObjsMutex == NULL)
 	{
 		m_cTextLog.Write("Allocate Memory For Maze Error");
+		return -1;
+	}
+
+	if(m_MazeNet.InitNet(4660, &m_cTextLog))
+	{
 		return -1;
 	}
 
@@ -95,6 +136,11 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 		return -1;
 	}
 
+	if(m_MazeNet.InitNet(4660, &m_cTextLog))
+	{
+		return -1;
+	}
+
 	if(m_pIMazeInterface->GenerateEmptyMaze(m_ppMazeArch, m_ppObjsPos, m_ppObjsMutex, uiX, uiY, 0))
 	{
 		return -1;
@@ -106,15 +152,17 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 int SafeMaze::StartExplore()
 {
+	long szpThrdParam[8];
 	for(int i = 0; i < 4; i ++)
 	{
 		if(m_szpExplorers[i] != NULL)
 		{
 			pthread_t tr;
-			long buff[2];
-			buff[0] = (long)this;
-			buff[1] = i;
-			pthread_create(&tr,NULL, ExplrThrd, buff);
+			szpThrdParam[i * 2] = (long)this;
+			szpThrdParam[i * 2 + 1] = i;
+			m_cTextLog.Write("SafeMaze(Out Thrd) ptr: %p", (long)this);
+			m_cTextLog.Write("ExploreNo(Out Thrd): %d", szpThrdParam[i * 2 + 1]);
+			pthread_create(&tr,NULL, ExplrThrd, &szpThrdParam[i * 2]);
 		}
 	}
 
@@ -220,13 +268,25 @@ int SafeMaze::SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& 
 	return 3;
 }
 
+int SafeMaze::StartNetServ()
+{
+	pthread_t thrd;
+	pthread_create(&thrd, NULL, StartNetSvrThrd, this);
+	return 0;
+}
+
 void* SafeMaze::ExplrThrd(void* param)
 {
 	srand(time(NULL));
 	long* lpArgv = (long*)param;
 	SafeMaze* pMaze = (SafeMaze*)(lpArgv[0]);
-	int iExplrNo = (int)(lpArgv[1]);
+	int iExplrNo = (int)*(long*)((char*)param + 8);
 
+	pMaze->m_cTextLog.Write("ExplrNo: %d start explore maze.", iExplrNo);
+	pMaze->m_cTextLog.Write("addr lpArgv[0]: %p", &lpArgv[0]);
+	pMaze->m_cTextLog.Write("addr lpArgv[1]: %p", &lpArgv[1]);
+	pMaze->m_cTextLog.Write("SafeMaze(In Thrd) ptr: %p", pMaze);
+	pMaze->m_cTextLog.Write("uiSleepInterval: %d", pMaze->m_uiSleepInterval);
 	while(1)
 	{
 		sleep(pMaze->m_uiSleepInterval);
@@ -294,6 +354,13 @@ void* SafeMaze::ExplrCompeteThrd(void* param)
 		break;
 	}
 //	pthread_rwlock_unlock(&rwlock);
+	return NULL;
+}
+
+void* SafeMaze::StartNetSvrThrd(void* vdparam)
+{
+	SafeMaze* pMaze = (SafeMaze*)vdparam;
+	pMaze->m_MazeNet.StartNetServ(&pMaze->m_cTextLog);
 	return NULL;
 }
 
