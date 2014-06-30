@@ -152,6 +152,7 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 int SafeMaze::StartExplore()
 {
+	StartNetServ();
 	long szpThrdParam[8];
 	for(int i = 0; i < 4; i ++)
 	{

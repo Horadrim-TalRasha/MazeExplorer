@@ -164,6 +164,8 @@ int MazeNet::StartNetServ(TextLog* pTextLog)
 					BreakConnect(evs[i].data.fd);
 					continue;
 				}
+
+				pTextLog->Write("client: %s:%d get %d bytes packet.", inet_ntoa(remoteSockAddr.sin_addr), ntohs(remoteSockAddr.sin_port), ret);
 			}
 		}
 	}
