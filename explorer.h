@@ -3,6 +3,7 @@
 
 #include "abspower.h"
 #include <math.h>
+#include <vector>
 
 enum EDirector
 {
@@ -11,6 +12,12 @@ enum EDirector
 	E_Left = 0x0004,
 	E_Right = 0x0008,
 	E_Directors
+};
+
+struct Position
+{
+	unsigned int m_uiX;
+	unsigned int m_uiY;
 };
 
 class Explorer
@@ -25,12 +32,15 @@ public:
 	inline void SetCurY(const int& iCurY) {	m_iCurY = iCurY;	}
 	inline int CurX() {	return m_iCurX;	}
 	inline int CurY() {	return m_iCurY;	}
+	void AddPath(const unsigned int& uiX, const unsigned int& uiY);
+	bool IsPosInPath(const unsigned int& uiX, const unsigned int& uiY);
 
 private:
 	int m_iCurX;
 	int	m_iCurY;
 
 	AbsPower* m_pPowers[E_Powers];
+	std::vector<Position> m_Path;
 };
 
 #endif

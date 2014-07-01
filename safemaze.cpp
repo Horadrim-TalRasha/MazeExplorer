@@ -373,7 +373,7 @@ int SafeMaze::MoveExplorer(const unsigned int& uiX, const unsigned int& uiY, Exp
 
 int SafeMaze::StrategyMove(Explorer* pExplr)
 {
-	int iAvailPosCount = -1;
+	int iAvailPosCount = 0;
 	EDirector szpEAvailDirectors[4];
 
 	if(IsPosInMaze(pExplr->CurX() + 1, pExplr->CurY()))
@@ -381,7 +381,7 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		if(!IsPosStocked(pExplr->CurX() + 1, pExplr->CurY()))
 		{
 			iAvailPosCount++;
-			szpEAvailDirectors[iAvailPosCount] = E_Right;
+			szpEAvailDirectors[iAvailPosCount - 1] = E_Right;
 			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX() + 1, pExplr->CurY(), E_Right, iAvailPosCount);
 		}
 	}
@@ -391,7 +391,7 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		if(!IsPosStocked(pExplr->CurX() - 1, pExplr->CurY()))
 		{
 			iAvailPosCount++;
-			szpEAvailDirectors[iAvailPosCount] = E_Left;
+			szpEAvailDirectors[iAvailPosCount - 1] = E_Left;
 			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX() - 1, pExplr->CurY(), E_Left, iAvailPosCount);
 		}
 	}
@@ -401,7 +401,7 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		if(!IsPosStocked(pExplr->CurX(), pExplr->CurY() + 1))
 		{
 			iAvailPosCount++;
-			szpEAvailDirectors[iAvailPosCount] = E_Down;
+			szpEAvailDirectors[iAvailPosCount - 1] = E_Down;
 			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX(), pExplr->CurY() + 1, E_Down, iAvailPosCount);
 		}
 	}
@@ -411,15 +411,22 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		if(!IsPosStocked(pExplr->CurX(), pExplr->CurY() - 1))
 		{
 			iAvailPosCount++;
-			szpEAvailDirectors[iAvailPosCount] = E_Up;
+			szpEAvailDirectors[iAvailPosCount - 1] = E_Up;
 			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX(), pExplr->CurY() - 1, E_Up, iAvailPosCount);
 		}
 	}
 
-	if(iAvailPosCount < 0)
+	if(iAvailPosCount <= 0)
 	{
 		m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
 		return 1;
+	}
+
+	for(int i = 0; i < iAvailPosCount; i++)
+	{
+		unsigned int uiDestX = 0;
+		unsigned int uiDestY = 0;
+//		pExplr-
 	}
 
 	unsigned int uiDestX = 0;

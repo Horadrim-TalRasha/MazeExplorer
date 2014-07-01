@@ -66,6 +66,26 @@ int Explorer::Walk(unsigned int& uiDestX, unsigned int& uiDestY, const EDirector
 	return 0;
 }
 
+void Explorer::AddPath(const unsigned int& uiX, const unsigned int& uiY)
+{
+
+}
+
+bool Explorer::IsPosInPath(const unsigned int& uiX, const unsigned int& uiY)
+{
+	std::vector<Position>::iterator it_start = m_Path.begin();
+	while(it_start != m_Path.end())
+	{
+		Position pos = *it_start;
+		if(pos.m_uiX == uiX && pos.m_uiY == uiY)
+		{
+			return true;
+		}
+		it_start++;
+	}
+	return false;
+}
+
 int Explorer::ActivatePower(AbsPower* pPower)
 {
 	pPower->ActivateInMaze(0);
