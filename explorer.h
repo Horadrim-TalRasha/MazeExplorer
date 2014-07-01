@@ -2,13 +2,14 @@
 #define EXPLORER_H
 
 #include "abspower.h"
+#include <math.h>
 
 enum EDirector
 {
-	E_Up = 0,
-	E_Down,
-	E_Left,
-	E_Right,
+	E_Up = 0x0001,
+	E_Down = 0x0002,
+	E_Left = 0x0004,
+	E_Right = 0x0008,
 	E_Directors
 };
 

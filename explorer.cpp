@@ -15,7 +15,11 @@ Explorer::~Explorer()
 
 int Explorer::Walk(unsigned int& uiDestX, unsigned int& uiDestY)
 {
-	EDirector eDirector = (EDirector)(random() % E_Directors);
+	int b = (int)(log(E_Directors - 1) / log(2)) + 1;
+	int c = random() % b;
+	int d = pow(2, c);
+	EDirector eDirector = (EDirector)d;
+//	EDirector eDirector = (EDirector)pow(random() % (int)(log((double)(E_Directors - 1)) / log(2.0)), 2);
 	uiDestX = m_iCurX;
 	uiDestY = m_iCurY;
 	switch(eDirector)

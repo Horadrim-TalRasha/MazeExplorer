@@ -3,9 +3,9 @@ CCX=g++
 CC=gcc
 CFLAGS = -g -Wall
 CXXFLAGS = -g -Wall
-OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o common/io/FileUtil.o common/network/mazenet.o
+OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o common/io/FileUtil.o common/network/mazenet.o strategy/normalstrategy.o
 
-INCLUDEPATH = -I./common/io/ -I./common/log -I./common -I./common/network
+INCLUDEPATH = -I./common/io/ -I./common/log -I./common -I./common/network -I./strategy
 
 ifeq ($(SKIP_TEST), true)
 	CXXFLAGS += -DSKIP_TEST

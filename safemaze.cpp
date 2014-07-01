@@ -152,7 +152,7 @@ int SafeMaze::InitEmptyMaze(const unsigned int& uiX, const unsigned int& uiY)
 
 int SafeMaze::StartExplore()
 {
-	StartNetServ();			//  此处起epoll能保证pthread_create传值不出错
+	StartNetServ();			//  此处起epoll能保证之后的pthread_create传值不出错
 	long szpThrdParam[8];
 	for(int i = 0; i < 4; i ++)
 	{
@@ -283,40 +283,12 @@ void* SafeMaze::ExplrThrd(void* param)
 	SafeMaze* pMaze = (SafeMaze*)(lpArgv[0]);
 	int iExplrNo = (int)*(long*)((char*)param + 8);
 
-	pMaze->m_cTextLog.Write("ExplrNo: %d start explore maze.", iExplrNo);
-	pMaze->m_cTextLog.Write("addr lpArgv[0]: %p", &lpArgv[0]);
-	pMaze->m_cTextLog.Write("addr lpArgv[1]: %p", &lpArgv[1]);
-	pMaze->m_cTextLog.Write("SafeMaze(In Thrd) ptr: %p", pMaze);
-	pMaze->m_cTextLog.Write("uiSleepInterval: %d", pMaze->m_uiSleepInterval);
 	while(1)
 	{
 		sleep(pMaze->m_uiSleepInterval);
-		unsigned int uiDestX = 0;
-		unsigned int uiDestY = 0;
-		const unsigned int iPrevX = pMaze->m_szpExplorers[iExplrNo]->CurX();
-		const unsigned int iPrevY = pMaze->m_szpExplorers[iExplrNo]->CurY();
-		if(pMaze->m_szpExplorers[iExplrNo]->Walk(uiDestX, uiDestY))
-		{
-			continue;
-		}
-
-		switch(pMaze->MoveExplorer(uiDestX, uiDestY, pMaze->m_szpExplorers[iExplrNo]))
-		{
-		case 0:
-			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
-			std::cout << "CUR POSITION" << std::endl;
-			pMaze->Display();
-			break;
-		case 1:
-			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
-			break;
-		case 2:
-			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
-			break;
-		case 3:
-			pMaze->m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, iExplrNo);
-			break;
-		}
+		pMaze->StrategyMove(pMaze->m_szpExplorers[iExplrNo]);
+		std::cout << "Cur Position" << std::endl;
+		pMaze->Display();
 	}
 
 	return NULL;
@@ -399,9 +371,114 @@ int SafeMaze::MoveExplorer(const unsigned int& uiX, const unsigned int& uiY, Exp
 	return 1;
 }
 
+int SafeMaze::StrategyMove(Explorer* pExplr)
+{
+	int iAvailPosCount = -1;
+	EDirector szpEAvailDirectors[4];
+
+	if(IsPosInMaze(pExplr->CurX() + 1, pExplr->CurY()))
+	{
+		if(!IsPosStocked(pExplr->CurX() + 1, pExplr->CurY()))
+		{
+			iAvailPosCount++;
+			szpEAvailDirectors[iAvailPosCount] = E_Right;
+			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX() + 1, pExplr->CurY(), E_Right, iAvailPosCount);
+		}
+	}
+
+	if(IsPosInMaze(pExplr->CurX() - 1, pExplr->CurY()))
+	{
+		if(!IsPosStocked(pExplr->CurX() - 1, pExplr->CurY()))
+		{
+			iAvailPosCount++;
+			szpEAvailDirectors[iAvailPosCount] = E_Left;
+			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX() - 1, pExplr->CurY(), E_Left, iAvailPosCount);
+		}
+	}
+
+	if(IsPosInMaze(pExplr->CurX(), pExplr->CurY() + 1))
+	{
+		if(!IsPosStocked(pExplr->CurX(), pExplr->CurY() + 1))
+		{
+			iAvailPosCount++;
+			szpEAvailDirectors[iAvailPosCount] = E_Down;
+			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX(), pExplr->CurY() + 1, E_Down, iAvailPosCount);
+		}
+	}
+
+	if(IsPosInMaze(pExplr->CurX(), pExplr->CurY() - 1))
+	{
+		if(!IsPosStocked(pExplr->CurX(), pExplr->CurY() - 1))
+		{
+			iAvailPosCount++;
+			szpEAvailDirectors[iAvailPosCount] = E_Up;
+			m_cTextLog.Write("x: %d, y: %d is available pos on Direction: %d at %d", pExplr->CurX(), pExplr->CurY() - 1, E_Up, iAvailPosCount);
+		}
+	}
+
+	if(iAvailPosCount < 0)
+	{
+		m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
+		return 1;
+	}
+
+	unsigned int uiDestX = 0;
+	unsigned int uiDestY = 0;
+	const unsigned int iPrevX = pExplr->CurX();
+	const unsigned int iPrevY = pExplr->CurY();
+	pExplr->Walk(uiDestX, uiDestY, szpEAvailDirectors[0]);
+	switch(MoveExplorer(uiDestX, uiDestY, pExplr))
+	{
+	case 0:
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		break;
+	case 1:
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		break;
+	case 2:
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		break;
+	case 3:
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		break;
+	}
+
+	return 0;
+}
+
 bool SafeMaze::IsPosInMaze(const unsigned int& uiX, const unsigned int& uiY)
 {
 	return ((uiX >= 0 && uiX <= m_uiX - 1) && (uiY >= 0 && uiY <= m_uiY - 1) && m_ppMazeArch[uiY][uiX] == 0);
+}
+
+bool SafeMaze::IsPosStocked(const unsigned int& uiX, const unsigned int& uiY)
+{
+	int iUnAvailPosCount = 0;
+	if(!IsPosInMaze(uiX + 1, uiY))
+	{
+		iUnAvailPosCount++;
+	}
+
+	if(!IsPosInMaze(uiX - 1, uiY))
+	{
+		iUnAvailPosCount++;
+	}
+
+	if(!IsPosInMaze(uiX, uiY + 1))
+	{
+		iUnAvailPosCount++;
+	}
+
+	if(!IsPosInMaze(uiX, uiY - 1))
+	{
+		iUnAvailPosCount++;
+	}
+
+	if(iUnAvailPosCount >= 3)
+	{
+		return true;
+	}
+	return false;
 }
 
 bool SafeMaze::TestMazeValIsBinary()

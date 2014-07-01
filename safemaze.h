@@ -25,6 +25,7 @@ public:
 	int SetExplorer(const int& idx, Explorer* pExplr, const unsigned int& uiX, const unsigned int& uiY);
 	int StartNetServ();
 	
+	
 	//	测试代码
 	bool TestMazeValIsBinary();				//	数组中的值只能为0和1
 	bool TestMazeCornValIsZero();			//	迷宫四个角上的值都为0
@@ -60,7 +61,9 @@ private:
 	static void* ExplrCompeteThrd(void* param);
 	static void* StartNetSvrThrd(void* vdparam);
 	bool IsPosInMaze(const unsigned int& uiX, const unsigned int& uiY);
+	bool IsPosStocked(const unsigned int& uiX, const unsigned int& uiY);
 	int MoveExplorer(const unsigned int& uiX, const unsigned int& uiY, Explorer* pExplr);
+	int StrategyMove(Explorer* pExplr);
 };
 
 #endif
