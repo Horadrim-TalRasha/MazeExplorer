@@ -68,7 +68,8 @@ int Explorer::Walk(unsigned int& uiDestX, unsigned int& uiDestY, const EDirector
 
 void Explorer::AddPath(const unsigned int& uiX, const unsigned int& uiY)
 {
-
+	Position pos = { uiX, uiY};
+	m_Path.push_back(pos);
 }
 
 bool Explorer::IsPosInPath(const unsigned int& uiX, const unsigned int& uiY)
@@ -84,6 +85,11 @@ bool Explorer::IsPosInPath(const unsigned int& uiX, const unsigned int& uiY)
 		it_start++;
 	}
 	return false;
+}
+
+int Explorer::PosCount()
+{
+	return m_Path.size();
 }
 
 int Explorer::ActivatePower(AbsPower* pPower)

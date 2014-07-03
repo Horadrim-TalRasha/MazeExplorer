@@ -9,7 +9,7 @@ m_pIMazeInterface(pIMazeInterface),
 m_ppMazeArch(0),
 m_uiX(0),
 m_uiY(0),
-m_uiSleepInterval(3)
+m_uiSleepInterval(5)
 {
 	strcpy(m_cLogConfig.szpLogPath, "./logs");
 	strcpy(m_cLogConfig.szpLogName, "maze_explorer_log");
@@ -161,8 +161,8 @@ int SafeMaze::StartExplore()
 			pthread_t tr;
 			szpThrdParam[i * 2] = (long)this;
 			szpThrdParam[i * 2 + 1] = i;
-			m_cTextLog.Write("SafeMaze(Out Thrd) ptr: %p", (long)this);
-			m_cTextLog.Write("ExploreNo(Out Thrd): %d", szpThrdParam[i * 2 + 1]);
+//			m_cTextLog.Write("SafeMaze(Out Thrd) ptr: %p", (long)this);
+//			m_cTextLog.Write("ExploreNo(Out Thrd): %d", szpThrdParam[i * 2 + 1]);
 			pthread_create(&tr,NULL, ExplrThrd, &szpThrdParam[i * 2]);
 		}
 	}
@@ -422,22 +422,40 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		return 1;
 	}
 
+	int idx = -1;
 	for(int i = 0; i < iAvailPosCount; i++)
 	{
 		unsigned int uiDestX = 0;
 		unsigned int uiDestY = 0;
-//		pExplr-
+		pExplr->Walk(uiDestX, uiDestY, szpEAvailDirectors[i]);
+		if(pExplr->IsPosInPath(uiDestX, uiDestY))
+		{
+			
+			m_cTextLog.Write("x:%d, y:%d is in path", uiDestX, uiDestY);
+			continue;
+		}
+		m_cTextLog.Write("x:%d, y:%d not in path", uiDestX, uiDestY);
+		idx = i;
 	}
 
+	if(idx == -1)
+	{
+		m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
+		return 1;
+	}
+
+	m_cTextLog.Write("Director: %d(i = %d) is available", (int)szpEAvailDirectors[idx], idx);
 	unsigned int uiDestX = 0;
 	unsigned int uiDestY = 0;
 	const unsigned int iPrevX = pExplr->CurX();
 	const unsigned int iPrevY = pExplr->CurY();
-	pExplr->Walk(uiDestX, uiDestY, szpEAvailDirectors[0]);
+	pExplr->Walk(uiDestX, uiDestY, szpEAvailDirectors[idx]);
 	switch(MoveExplorer(uiDestX, uiDestY, pExplr))
 	{
 	case 0:
 		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		pExplr->AddPath(iPrevX, iPrevY);
+		m_cTextLog.Write("pos count: %d", pExplr->PosCount());
 		break;
 	case 1:
 		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);

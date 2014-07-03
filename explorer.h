@@ -34,7 +34,7 @@ public:
 	inline int CurY() {	return m_iCurY;	}
 	void AddPath(const unsigned int& uiX, const unsigned int& uiY);
 	bool IsPosInPath(const unsigned int& uiX, const unsigned int& uiY);
-
+	int PosCount();
 private:
 	int m_iCurX;
 	int	m_iCurY;
