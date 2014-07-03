@@ -418,7 +418,18 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 
 	if(iAvailPosCount <= 0)
 	{
-		m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
+		if(pExplr->PosCount() == 0)
+		{
+			m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
+			return 1;
+		}
+		unsigned int uiBackX = 0;
+		unsigned int uiBackY = 0;
+		pExplr->LastPath(uiBackX, uiBackY);
+		if(!MoveExplorer(uiBackX, uiBackY, pExplr))
+		{
+			pExplr->TurnBack();
+		}
 		return 1;
 	}
 
@@ -430,7 +441,6 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 		pExplr->Walk(uiDestX, uiDestY, szpEAvailDirectors[i]);
 		if(pExplr->IsPosInPath(uiDestX, uiDestY))
 		{
-			
 			m_cTextLog.Write("x:%d, y:%d is in path", uiDestX, uiDestY);
 			continue;
 		}
@@ -440,7 +450,19 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 
 	if(idx == -1)
 	{
-		m_cTextLog.Write("when explorer at x:%d, y:%d is stocked", pExplr->CurX(), pExplr->CurY());
+		if(pExplr->PosCount() == 0)
+		{
+			m_cTextLog.Write("when explorer at x:%d, y:%d is stocked and all pos is in path.", pExplr->CurX(), pExplr->CurY());
+			return 1;
+		}
+
+		unsigned int uiBackX = 0;
+		unsigned int uiBackY = 0;
+		pExplr->LastPath(uiBackX, uiBackY);
+		if(!MoveExplorer(uiBackX, uiBackY, pExplr))
+		{
+			pExplr->TurnBack();
+		}
 		return 1;
 	}
 
@@ -453,18 +475,18 @@ int SafeMaze::StrategyMove(Explorer* pExplr)
 	switch(MoveExplorer(uiDestX, uiDestY, pExplr))
 	{
 	case 0:
-		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Success.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[idx]);
 		pExplr->AddPath(iPrevX, iPrevY);
 		m_cTextLog.Write("pos count: %d", pExplr->PosCount());
 		break;
 	case 1:
-		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos can't be access.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[idx]);
 		break;
 	case 2:
-		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to read pos status.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[idx]);
 		break;
 	case 3:
-		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[0]);
+		m_cTextLog.Write("Explorer at x: %d, y: %d ==> x: %d, y: %d On Direction: %d Failed. Maze Pos occupied when explore want to move to is.", iPrevX, iPrevY, uiDestX, uiDestY, szpEAvailDirectors[idx]);
 		break;
 	}
 

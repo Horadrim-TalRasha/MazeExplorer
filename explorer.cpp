@@ -92,6 +92,33 @@ int Explorer::PosCount()
 	return m_Path.size();
 }
 
+int Explorer::LastPath(unsigned int& uiX, unsigned int& uiY)
+{
+	if(m_Path.size() == 0)
+	{
+		return 1;
+	}
+
+	uiX = m_Path.back().m_uiX;
+	uiY = m_Path.back().m_uiY;	
+	return 0;
+}
+
+void Explorer::TurnBack()
+{
+	m_Path.pop_back();
+}
+
+int Explorer::IsPosInSameDirection(const unsigned int& uiX1, const unsigned int& uiX2, const unsigned int& uiY1, const unsigned int& uiY2)
+{
+	return 0;
+}
+
+int Explorer::BackToSourceOfDirection(unsigned int& uiX, unsigned int& uiY)
+{
+	return 0;
+}
+
 int Explorer::ActivatePower(AbsPower* pPower)
 {
 	pPower->ActivateInMaze(0);
