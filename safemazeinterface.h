@@ -5,6 +5,8 @@
 #include "TextLog.h"
 
 
+#define AAAAAAA
+
 class SafeMazeInterface : public IMazeInterface
 {
 public:
