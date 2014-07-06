@@ -31,6 +31,10 @@ protected:
 
 protected:
 	void BreakConnect(const int& iSocket);
+	virtual bool CheckPack(const int& iPacketLen, char* szpBuff, TextLog* pTextLog);
+	virtual int ProcPack(TextLog* pTextLog, char* szpBuff);
+
+private:
 };
 
 #endif
