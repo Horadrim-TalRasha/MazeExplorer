@@ -1,5 +1,5 @@
 #include "mazenet.h"
-
+#include "protocol.h"
 
 MazeNet::MazeNet() :
 m_sLsnSocket(-1),
@@ -164,7 +164,11 @@ int MazeNet::StartNetServ(TextLog* pTextLog)
 					BreakConnect(evs[i].data.fd);
 					continue;
 				}
-
+				
+				if(!CheckPack(ret, buff, pTextLog))
+				{
+					return -1;
+				}
 				pTextLog->Write("client: %s:%d get %d bytes packet.", inet_ntoa(remoteSockAddr.sin_addr), ntohs(remoteSockAddr.sin_port), ret);
 			}
 		}
@@ -178,3 +182,24 @@ void MazeNet::BreakConnect(const int& fd)
 	close(fd);
 }
 
+bool MazeNet::CheckPack(const int& iPacketLen, char* buff, TextLog* pTextLog)
+{
+	unsigned int uiBodyLen = *(unsigned int*)(buff + 4);
+	if(uiBodyLen + sizeof(int) > (unsigned int)m_uiMaxPacketSize || uiBodyLen + sizeof(int) < (unsigned int)m_uiMinPacketSize)
+	{
+		pTextLog->Write("packet size error(%dbytes)", iPacketLen);
+		return false;
+	}
+	if(*(unsigned int*)(buff + iPacketLen - sizeof(unsigned short)) != END_CODE)
+	{
+		pTextLog->Write("packet end code error");
+		return false;
+	}
+	return true;
+}
+
+int MazeNet::ProcPack(TextLog* pTextLog, char* szpBuff)
+{
+
+	return 0;
+}
