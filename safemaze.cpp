@@ -332,6 +332,7 @@ void* SafeMaze::ExplrCompeteThrd(void* param)
 
 void* SafeMaze::StartNetSvrThrd(void* vdparam)
 {
+	srand(time(NULL));
 	SafeMaze* pMaze = (SafeMaze*)vdparam;
 	pMaze->m_MazeNet.StartNetServ(&pMaze->m_cTextLog);
 	return NULL;

@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include "safemaze.h"
 #include "safemazeinterface.h"
 #include "explorer.h"

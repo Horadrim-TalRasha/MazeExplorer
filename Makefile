@@ -3,7 +3,7 @@ CCX=g++
 CC=gcc
 CFLAGS = -g -Wall
 CXXFLAGS = -g -Wall
-OBJS = MazeExpl.o safemaze.o safemazeinterface.o explorer.o explorerpath.o common/io/FileUtil.o common/network/mazenet.o strategy/normalstrategy.o
+OBJS = MazeManualExpl.o safemaze.o safemazeinterface.o explorer.o common/io/FileUtil.o common/network/mazenet.o
 
 INCLUDEPATH = -I./common/io/ -I./common/log -I./common -I./common/network -I./strategy -I./common/protocol
 
